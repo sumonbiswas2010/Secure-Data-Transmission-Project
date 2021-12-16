@@ -10,24 +10,28 @@ const Ui = (props) => {
     const [password, setPassword] = useState();
     const [username, setUsername] = useState();
     const [msg, setMsg] = useState();
+    const [msg2, setMsg2] = useState();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [w, setW] = useState(false);
-    const [type, setType] = useState("Savings");
-    const [bal, setBal] = useState();
-    const [balance, setBalance] = useState(50000);
-    const [t, setT] = useState(false);
-    const [au, setAu] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [transaction, setTransaction] = useState([]);
-    const [n, setN] = useState(1);
 
-    const [data, setData] = useState([]);
-    const [flag, setFlag] = useState([]);
+    const [data, setData] = useState();
+    const [flag, setFlag] = useState();
+    const [divisor, setDivisor] = useState();
+    const [type, setType] = useState();
+
+    const [crcData, setCrcData] = useState();
+    const [parityData, setParityData] = useState();
+    const [stuffData, setStuffData] = useState();
     
+    const [change, setChange] = useState();
 
-    //let token = localStorage.getItem("balance")
+    const [deStuffData, setDeStuffData] = useState();
+    const [checkedParityData, setCheckedParityData] = useState();
+    const [deCrcData, setDeCrcData] = useState();
+
+
     const user = "Sumon Biswas"
-    const atm = "ATM007"
+
     const signUpHandler = () => {
         if(username=="sumon" && password=="123"){
             setIsLoggedIn(true)
@@ -35,20 +39,6 @@ const Ui = (props) => {
         }else{  setMsg("Invalid Username or Password")}
     }
 
-    const auth = () => { 
-        setT(true)
-        setLoading(true)
-        setMsg("")
-    }
-
-    const withdrawBalance1 = () => {
-        if(bal<balance){      
-            auth();       
-        }
-        else{
-            setT(false)
-            setMsg("Insufficient Balance")}
-     }
     
 
 
@@ -60,48 +50,22 @@ const Ui = (props) => {
         setUsername(e.target.value);
     }
 
-    const checkBalance = () => { 
-        setMsg("Your Balance is: "+balance)
-    }
-
-    const serviceSet = e => {
-        setType(e.target.value);
-    }
-
-    const balChange = e => {
-        setBal(e.target.value);
-    }
-
     const dataSet = e => {
         setData(e.target.value);
     }
     const flagSet = e => {
         setFlag(e.target.value);
     }
-
-    const approve = e => {
-        setAu(true);
-        
-        setBalance(balance -bal)
-        setMsg("Withdraw Successful")
-        setN(n+1)
-        setTransaction([...transaction, [n, ". Sumon Biswas - ATM007 - Type: ",type, ", Withdraw - ", bal, <br/>]])
-        setLoading(false)
-        setT(false)
+    const divisorSet = e => {
+        setDivisor(e.target.value);
     }
-
-    const deny = e => {
-        setAu(false);
-        setMsg("Withdraw Denied")
-        setLoading(false)
-        setT(false)
+    const changeSet = e => {
+        setChange(e.target.value);
     }
-    //document.getElementById("flaginput").style.display = "none"
-    //document.getElementById("flaginputbtn").style.display = "none"
 
     const bitCheck = data =>{
         let count = 0;
-        console.log(data);
+
         data.split("").forEach(c => {
             if(c!='0' && c!='1'){     
                 count++;
@@ -160,18 +124,17 @@ const Ui = (props) => {
 
         }
         dx = dx + newData.substring(dx.length, newData.length);
-        
-
+        return dx;
 
     }
 
-    const DeCrc = (dx, dv) =>{
+    const deCrc = (dx, dv) =>{
 
         const dv2 = new Array(dv.length+1).join( '0' );
         let newData = dx;
 
         let f;
-        console.log(dx, dv)
+
         
         for(let i=0; i<(newData.length-dv.length); i++) {
             let t;
@@ -221,11 +184,11 @@ const Ui = (props) => {
             }
         }
         if(count==newData.length){
-            console.log(count, true);
+
             return true;
         }
         else {
-            console.log(count, false);
+
             return false;
         }
         
@@ -332,13 +295,13 @@ const Ui = (props) => {
     function MyComponent(){
         useEffect(()=>{
             crc("110011", "000") 
-            DeCrc("1001110", "1011")
+            deCrc("1001110", "1011")
             bitStuff("011000110", "0110")
             bitDeStuff("01110001110", "0110");
             let x = parity("01110101", "odd")
-            console.log(x)
+
             let y = parityCheck("0111101", "odd")
-            console.log(y)
+
         }, []) 
 
     }
@@ -348,10 +311,14 @@ const Ui = (props) => {
 
     const makeSecure = e => {
         e.preventDefault();
+        if(data==null){
+            setMsg("Please enter Data");
+            return;
+        }
         const count = bitCheck(data)
         if(count==0){
-            setMsg("Data is Secure")
-            console.log(data.length + data[2])
+            setMsg("Flag is Secure")
+
             document.getElementById("datainput").style.display = "none"
             document.getElementById("datainputbtn").style.display = "none"
             document.getElementById("flaginput").style.display = "inline-block"
@@ -360,22 +327,107 @@ const Ui = (props) => {
         else{
             setMsg("Invalid Data")
         }
-        console.log(count)
+
         
     }
     const makeSecureFlag = e => {
+        setType("odd")
         
         e.preventDefault();
-        const count = bitCheck(data)
+        if(flag==null){
+            setMsg("Please enter Flag");
+            return;
+        }
+        const count = bitCheck(flag)
         if(count==0){
-            setMsg("Data is Secure")
+            setMsg("Flag is Valid")
+            document.getElementById("flaginput").style.display = "none"
+            document.getElementById("flaginputbtn").style.display = "none"
+            document.getElementById("divisorinput").style.display = "inline-block"
+            document.getElementById("divisorinputbtn").style.display = "inline-block"
 
         }
         else{
             setMsg("Invalid Flag")
         }
-        console.log(count)
+
         
+    }
+
+    const makeSecureDivisor = e => {
+        
+        e.preventDefault();
+        if(divisor==null){
+            setMsg("Please enter Divisor");
+            return;
+        }
+        const count = bitCheck(divisor)
+        if(count==0){
+            setMsg("Divisor is Valid")
+            //setLoading(true)
+            doEverything();
+        }
+        else{
+            setMsg("Invalid Divisor")
+        }
+
+        
+    }
+
+    const doEverything = () => {
+        let x = crc(data, divisor);
+        setCrcData(x);
+        let y = parity(x, type);
+        setParityData(y)
+        let z = bitStuff(y, flag);
+        setStuffData(z);
+        // setCrcData(crc(data, divisor));
+        // //setTimeout(parity, 1000, crcData, "odd")
+        // setParityData(setTimeout(parity, 1000, crcData, "odd"));
+        // setStuffData(bitStuff(parityData, divisor));
+
+        setChange(flag+z+flag)
+    }
+
+    const send = () => {
+        receive (change, flag, type, divisor);
+
+    }
+    const changeit = () => {
+
+        //document.getElementById("changebtn").style.display = "inline-blocks";
+        document.getElementById("changeinput").style.display = "inline-block";
+
+    }
+
+    const receive =  (dx, f, t, dv) => {
+
+        let data = dx.split(f);
+
+        let x = bitDeStuff(data[1], f);
+
+        setDeStuffData(x);
+        let y = parityCheck(x, t);
+        console.log(y +t + "iii")
+        if(y==true){
+            y=x.substring(0, x.length-1)
+            setCheckedParityData(y);
+        }
+        else {
+            console.log("geche re")
+            setMsg2("Invalid")
+        }
+
+        let z = deCrc(y, dv);
+        if(z==true){
+            z = y.substring(0, y.length-dv.length+1)
+            setDeCrcData(z);
+        }
+        else {
+            console.log("geche re")
+            setMsg2("Invalid")
+        }
+
     }
 
     
@@ -396,68 +448,56 @@ const Ui = (props) => {
                 <p>{msg}</p>
             </div>}
             
-            {!au && !loading && isLoggedIn && <div>
-                <p>Please Select From Below</p>
+            {!loading && isLoggedIn && <div>
+                <p>Please Enter the Informations</p>
+                <form>
                 <input id="datainput" type='text' onChange={dataSet} placeholder="Enter Data" /><br/><br/>
-                <button id="datainputbtn" onClick={makeSecure}>Submit Data</button><br></br><br/>
+                <button id="datainputbtn"  type="submit" onClick={makeSecure}>Submit Data</button><br></br><br/>
                 <input style={{display: "none"}} id="flaginput" type='text' onChange={flagSet} placeholder="Enter Flag" /><br/><br/>
-                <button style={{display: "none"}} id="flaginputbtn" onClick={makeSecureFlag}>Submit Flag</button><br></br><br/>
+                <button style={{display: "none"}}  id="flaginputbtn" onClick={makeSecureFlag}>Submit Flag</button><br></br><br/>
+                <input style={{display: "none"}} id="divisorinput" type='text' onChange={divisorSet} placeholder="Enter Divisor for CRC" /><br/><br/>
+                <button style={{display: "none"}}  id="divisorinputbtn" onClick={makeSecureDivisor}>Submit Divisor</button><br></br><br/>
+                </form>
                 <p className="red center">{msg}</p>
+
                 
             </div>}
-
-            {!au && !loading && isLoggedIn && w && 
-                <div>
-                    <label>Select Accout Type</label>
-                    <select name="serviceType" value={type} onChange={serviceSet}>
-                        <option value="Savings">Savings</option>
-                        <option value="Current">Current</option>
-                        <option value="Checking">Checking</option>
-                        <option value="Others">Others</option>
-                    </select><br/><br/>
-                    <label>Enter Balance</label> <input onChange={balChange} type="number"></input><br/><br/>
-                    <button onClick={withdrawBalance1}>Withdraw</button><br></br>
-                    <p className="red center">{msg}</p>
-                </div>
-            }
-
-            {au && 
-                <div>
-                    <p className="red center">{msg}</p>
-                    <p>Approved</p>
-                    <div id='receipt'>
-                    <p className="hello">Receipt</p>
-                        <p>Time: {Date().toLocaleString()}</p>
-                        <p>ATM Code: 007</p>
-                        <p>Customer Name: Sumon Biswas</p>
-                        <p>Account Number: 01672836364</p>
-                        <p>Withdraw Amount: {bal}, Available Balance: {balance} USD</p>
-                        <p></p>
-                        
-                    </div>
-                    <button onClick={() => {setAu(false)}}>New Transaction</button>
-                </div>}
-                
-            
 
         </div> 
 
         <div className="auth">
-            <p className="hello">Financial System Authority</p>
-            {t && <div>
-                <p>{user} wants to withdraw USD{bal} ({type}) from {atm}</p>
-                <button onClick={approve}>Approve</button><br></br><br/>
-                <button onClick={deny}>Deny</button><br></br><br/>
-                </div>}
+            <p className="hello">Processed Data</p>
+            <div>
+                <p >Data: {data}</p>
+                <p className="left">CRC: {crcData}</p>
+                <p className="left">Parity: {parityData}</p>
+                <p className="left">BitStuffing: {stuffData}</p>
+                <p className="right">Divisor: {divisor}</p>
+                <p className="right">Parity Type: {type}</p>
+                <p className="right">Flag: {flag}</p>
+                
+                <p>Ready to Transmit: {flag+stuffData+flag}</p>
+                <label>You want to send it or change it?</label><br></br>
+                <button onClick={changeit}>Change It</button><br></br>
+                <input id="changeinput" style={{display: "none"}} value={change} id="changeinput" type='text' onChange={changeSet} placeholder="Change Data" /><br></br>
+                <button onClick={send}>Send It</button>
+            </div>
 
         </div> 
 
         <div className="atm">
-            <p className="hello">ATM Logs</p>
+            <p className="hello">Received Logs</p>
 
             <div className="logs">
-                <p>{transaction}</p>
-                </div>
+                <p className="left">CRC: {deCrcData}</p>
+                <p className="left">Parity: {checkedParityData}</p>
+                <p className="left">BitStuffing: {deStuffData}</p>
+                {/* <p className="right">Divisor: {divisor}</p>
+                <p className="right">Parity Type: {type}</p>
+                <p className="right">Flag: {flag}</p> */}
+                
+            </div>
+            <p>{msg2}</p>
                 
         </div> 
         <p id="footer">Secure Data Transmission</p>

@@ -6,7 +6,12 @@
 .auth{
     background-color: salmon !important;
 }
-
+.left{
+    text-align: left !important;
+}
+.right{
+    text-align: right !important;
+}
 
 
 #receipt{
@@ -16,7 +21,7 @@
 
 .user, .auth, .atm {
     align-items: center;
-    height: 400px;
+    height: 450px;
     border: 1px solid red;
     margin: 1px;
     width: 33%;
