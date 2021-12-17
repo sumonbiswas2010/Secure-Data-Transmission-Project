@@ -10,9 +10,12 @@ const Ui = (props) => {
     const [password, setPassword] = useState();
     const [username, setUsername] = useState();
     const [msg, setMsg] = useState();
+    const [msg1, setMsg1] = useState();
     const [msg2, setMsg2] = useState();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [loading1, setLoading1] = useState(false);
+    const [loading2, setLoading2] = useState(false);
+    const [loading3, setLoading3] = useState(false);
 
     const [data, setData] = useState();
     const [flag, setFlag] = useState();
@@ -36,6 +39,8 @@ const Ui = (props) => {
         if(username=="sumon" && password=="123"){
             setIsLoggedIn(true)
             setMsg("Welcome Sumon")
+            setLoading2(true)
+            setLoading3(true)
         }else{  setMsg("Invalid Username or Password")}
     }
 
@@ -61,6 +66,10 @@ const Ui = (props) => {
     }
     const changeSet = e => {
         setChange(e.target.value);
+    }
+    const typeSet = e => {
+        console.log(type + "is type")
+        setType(e.target.value)
     }
 
     const bitCheck = data =>{
@@ -196,10 +205,12 @@ const Ui = (props) => {
     }
 
     const bitStuff = (d, f) => {
+        const flag = f;
+        f= f.substring(0, f.length-1);
 
         for(let i=0; i<=(d.length-f.length); i++) {
             let t;
-            if(f[f.length-1]=='1'){
+            if(f[flag.length-1]=='1'){
                 t='0'
             }
             else t = '1'
@@ -207,7 +218,7 @@ const Ui = (props) => {
             let x = d.substring(i, (i+f.length))
             if(x==f){
                 let j;
-                y = d.substring(0, i+f.length-1) + t + d.substring(i+f.length-1, d.length);
+                y = d.substring(0, i+f.length) + t + d.substring(i+f.length, d.length);
 
             }
             d=y;
@@ -331,7 +342,6 @@ const Ui = (props) => {
         
     }
     const makeSecureFlag = e => {
-        setType("odd")
         
         e.preventDefault();
         if(flag==null){
@@ -365,12 +375,28 @@ const Ui = (props) => {
         if(count==0){
             setMsg("Divisor is Valid")
             //setLoading(true)
-            doEverything();
+            document.getElementById("divisorinput").style.display = "none"
+            document.getElementById("divisorinputbtn").style.display = "none"
+            document.getElementById("radios").style.display = "inline-block"
         }
         else{
             setMsg("Invalid Divisor")
         }
 
+        
+    }
+
+    const makeSecureParity = e => {
+        
+        e.preventDefault();
+        setLoading2(false)
+        if(type==null){
+            setMsg("Please select Parity Type");
+            return;
+        }
+        else{
+            doEverything();
+        }
         
     }
 
@@ -390,7 +416,22 @@ const Ui = (props) => {
     }
 
     const send = () => {
-        receive (change, flag, type, divisor);
+        
+        setLoading3(false)
+        if(change==null){
+            setMsg1("Transmission data cannot be null")
+            return;
+        }
+        const count = bitCheck(change);
+        if(count==0){
+            setMsg1("Transmitting Data...")
+            receive (change, flag, type, divisor);
+        }
+        else {
+            setMsg1("Invalid Transmission data")
+            return;
+        }
+        
 
     }
     const changeit = () => {
@@ -412,22 +453,39 @@ const Ui = (props) => {
         if(y==true){
             y=x.substring(0, x.length-1)
             setCheckedParityData(y);
+            setMsg2("Valid on Parity Check")
         }
         else {
-            console.log("geche re")
-            setMsg2("Invalid")
+            setCheckedParityData("Invalid Data");
+            setDeCrcData("Invalid Data")
+
+            setMsg2("Invalid on Parity Check")
+            return
         }
 
         let z = deCrc(y, dv);
         if(z==true){
             z = y.substring(0, y.length-dv.length+1)
             setDeCrcData(z);
+            setMsg2("Valid Data Received")
         }
         else {
-            console.log("geche re")
-            setMsg2("Invalid")
+            setDeCrcData("Invalid Data")
+            setMsg2("Invalid on CRC Check")
         }
 
+    }
+
+    const tryAgain = (e) => {
+        e.preventDefault();
+        document.getElementById("datainput").style.display = "inline-block"
+        document.getElementById("datainputbtn").style.display = "inline-block"
+        document.getElementById("divisorinput").style.display = "inline-block"
+        document.getElementById("divisorinputbtn").style.display = "inline-block"
+        document.getElementById("flaginput").style.display = "inline-block"
+        document.getElementById("flaginputbtn").style.display = "inline-block"
+        document.getElementById("radios").style.display = "inline-block"
+        
     }
 
     
@@ -438,9 +496,9 @@ const Ui = (props) => {
 
         <div className="user">
             <p className="hello">Welcome to our Project</p>
-            { loading && <Loading/>}
+            { loading1 && <Loading/>}
             
-            {!loading && !isLoggedIn && <div>
+            {!isLoggedIn && <div>
             <p>Enter you credentials to Login</p>
                 <label> Username: </label> <input type="text" onChange={usernameChange} placeholder="Enter Username" /><br/><br/>
                 <label> Password: </label> <input type="password" onChange={passwordChange} placeholder="Enter Password" /><br/><br/>
@@ -448,17 +506,26 @@ const Ui = (props) => {
                 <p>{msg}</p>
             </div>}
             
-            {!loading && isLoggedIn && <div>
+            {isLoggedIn && <div>
                 <p>Please Enter the Informations</p>
                 <form>
-                <input id="datainput" type='text' onChange={dataSet} placeholder="Enter Data" /><br/><br/>
+                <input id="datainput" type='text' onChange={dataSet} placeholder="Enter Data" />
                 <button id="datainputbtn"  type="submit" onClick={makeSecure}>Submit Data</button><br></br><br/>
-                <input style={{display: "none"}} id="flaginput" type='text' onChange={flagSet} placeholder="Enter Flag" /><br/><br/>
+                <input style={{display: "none"}} id="flaginput" type='text' onChange={flagSet} placeholder="Enter Flag" />
                 <button style={{display: "none"}}  id="flaginputbtn" onClick={makeSecureFlag}>Submit Flag</button><br></br><br/>
-                <input style={{display: "none"}} id="divisorinput" type='text' onChange={divisorSet} placeholder="Enter Divisor for CRC" /><br/><br/>
+                <input style={{display: "none"}} id="divisorinput" type='text' onChange={divisorSet} placeholder="Enter Divisor for CRC" />
                 <button style={{display: "none"}}  id="divisorinputbtn" onClick={makeSecureDivisor}>Submit Divisor</button><br></br><br/>
+                <div id = "radios" style={{display: "none"}}>
+                    <form>
+                    <label>Odd</label><input id="radio1" name="radios" type='radio' value="odd" onClick={typeSet}/>
+                    <label>Even</label><input  id="radio2" name="radios" type='radio' value="even" onClick={typeSet}/>
+                    <button onClick={makeSecureParity}>Submit Parity Type</button><br></br><br/>
+                    </form>
+                </div>
                 </form>
                 <p className="red center">{msg}</p>
+
+                <button id="try" onClick={tryAgain}>Try Again</button>
 
                 
             </div>}
@@ -466,7 +533,10 @@ const Ui = (props) => {
         </div> 
 
         <div className="auth">
-            <p className="hello">Processed Data</p>
+        <p className="hello">Processed Data</p>
+        { loading2 && <Loading/>}
+        { !loading2 && isLoggedIn && <div>
+            
             <div>
                 <p >Data: {data}</p>
                 <p className="left">CRC: {crcData}</p>
@@ -481,23 +551,26 @@ const Ui = (props) => {
                 <button onClick={changeit}>Change It</button><br></br>
                 <input id="changeinput" style={{display: "none"}} value={change} id="changeinput" type='text' onChange={changeSet} placeholder="Change Data" /><br></br>
                 <button onClick={send}>Send It</button>
-            </div>
+                <p>{msg1}</p>
+                </div>
+            </div>}
 
         </div> 
 
         <div className="atm">
             <p className="hello">Received Logs</p>
+            { loading3 && <Loading/>}
 
-            <div className="logs">
+            {!loading3 && isLoggedIn && <div className="logs">
                 <p className="left">CRC: {deCrcData}</p>
                 <p className="left">Parity: {checkedParityData}</p>
                 <p className="left">BitStuffing: {deStuffData}</p>
                 {/* <p className="right">Divisor: {divisor}</p>
                 <p className="right">Parity Type: {type}</p>
                 <p className="right">Flag: {flag}</p> */}
-                
-            </div>
-            <p>{msg2}</p>
+                <p>{msg2}</p>
+            </div>}
+            
                 
         </div> 
         <p id="footer">Secure Data Transmission</p>

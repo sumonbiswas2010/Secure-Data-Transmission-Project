@@ -1,3 +1,13 @@
+#try {
+    position: absolute;
+    bottom: 10px;
+    display: inline-block;
+    left: 0; 
+    right: 0; 
+    margin-left: auto; 
+    margin-right: auto; 
+    width: 100px;
+}
 
 .user{
     background-color: aqua !important;
@@ -20,11 +30,13 @@
 }
 
 .user, .auth, .atm {
+    position: relative;
+    padding: 7px;
     align-items: center;
     height: 450px;
     border: 1px solid red;
     margin: 1px;
-    width: 33%;
+    width: 32%;
     float: left;
     justify-content: space-evenly;
 }
