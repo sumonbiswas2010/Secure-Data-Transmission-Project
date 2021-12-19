@@ -139,14 +139,17 @@ const Ui = (props) => {
 
     const deCrc = (dx, dv) =>{
 
+        console.log(dx, dv)
+
         const dv2 = new Array(dv.length+1).join( '0' );
         let newData = dx;
 
         let f;
 
         
-        for(let i=0; i<(newData.length-dv.length); i++) {
+        for(let i=0; i<=(newData.length-dv.length); i++) {
             let t;
+            
 
             if(newData[i]=='1'){
                 t=dv
@@ -192,6 +195,7 @@ const Ui = (props) => {
                 count++;
             }
         }
+        console.log(count, newData);
         if(count==newData.length){
 
             return true;
