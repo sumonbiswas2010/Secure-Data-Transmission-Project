@@ -482,6 +482,8 @@ const Ui = (props) => {
 
     const tryAgain = (e) => {
         e.preventDefault();
+        setLoading3(true);
+        setLoading2(true);
         document.getElementById("datainput").style.display = "inline-block"
         document.getElementById("datainputbtn").style.display = "inline-block"
         document.getElementById("divisorinput").style.display = "inline-block"
