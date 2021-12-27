@@ -68,7 +68,6 @@ const Ui = (props) => {
         setChange(e.target.value);
     }
     const typeSet = e => {
-        console.log(type + "is type")
         setType(e.target.value)
     }
 
@@ -139,8 +138,6 @@ const Ui = (props) => {
 
     const deCrc = (dx, dv) =>{
 
-        console.log(dx, dv)
-
         const dv2 = new Array(dv.length+1).join( '0' );
         let newData = dx;
 
@@ -195,7 +192,7 @@ const Ui = (props) => {
                 count++;
             }
         }
-        console.log(count, newData);
+
         if(count==newData.length){
 
             return true;
@@ -210,58 +207,53 @@ const Ui = (props) => {
 
     const bitStuff = (d, f) => {
         const flag = f;
-        f= f.substring(0, f.length-1);
+        f= f.substring(0, f.length-2);
 
-        for(let i=0; i<=(d.length-f.length); i++) {
-            let t;
-            if(f[flag.length-1]=='1'){
-                t='0'
-            }
-            else t = '1'
+        for(let i=0; i<=(d.length-f.length-1); i++) {
+            
             let y=d;
             let x = d.substring(i, (i+f.length))
             if(x==f){
-                let j;
-                y = d.substring(0, i+f.length) + t + d.substring(i+f.length, d.length);
-
+                y = d.substring(0, i+f.length) + '0' + d.substring(i+f.length, d.length);
+                i=i+f.length-1;
             }
             d=y;
             
- 
-            if(d[i]==f){
-                d[i]='0';
-            }
         }
 
         return d;
     }
+
+
     
 
     const bitDeStuff = (d, f) => {
 
-        const ff = f.substring(0, (f.length-1))
+        const ff = f.substring(0, (f.length-2));
+        let res=d;
+        let c =0;
 
-        let t;
-
-
-        for(let i=0; i<=(d.length-ff.length); i++) {
+        for(let i=0; i<=(res.length-ff.length); i++) {
             
             let y=d;
-            let x = d.substring(i, (i+f.length-1))
-            if(x==ff){
-
-                y = d.substring(0, i+f.length-1) + d.substring(i+f.length, d.length);
-    
-            }
-            d=y;
+            let x = d.substring(i, (i+f.length-2))
             
 
-            if(d[i]==f){
-                d[i]='0';
+            if(x==ff){
+                
+                res = res.substring(0, i+f.length-2-c) + res.substring(i+f.length-1-c, d.length);
+
+                c=c+1;
             }
+            
+           // res = res.substring(0, i) + d.substring(i, d.lenghth);
+            //d=y;
+            
         }
-        return d;
+        return res;
     }
+
+
 
     const parity = (d, type) => {
         let count=0;
@@ -354,18 +346,22 @@ const Ui = (props) => {
         }
         const count = bitCheck(flag)
         if(count==0){
-            setMsg("Flag is Valid")
-            document.getElementById("flaginput").style.display = "none"
-            document.getElementById("flaginputbtn").style.display = "none"
-            document.getElementById("divisorinput").style.display = "inline-block"
-            document.getElementById("divisorinputbtn").style.display = "inline-block"
-
+            if(flag[0]=='0' && flag[flag.length-1]=='0')
+            {
+                setMsg("Flag is Valid")
+                document.getElementById("flaginput").style.display = "none"
+                document.getElementById("flaginputbtn").style.display = "none"
+                document.getElementById("divisorinput").style.display = "inline-block"
+                document.getElementById("divisorinputbtn").style.display = "inline-block"
+            }
+            else {
+                setMsg("Invalid Flag")
+            }
+            
         }
         else{
             setMsg("Invalid Flag")
         }
-
-        
     }
 
     const makeSecureDivisor = e => {
@@ -393,12 +389,13 @@ const Ui = (props) => {
     const makeSecureParity = e => {
         
         e.preventDefault();
-        setLoading2(false)
+        setLoading2(true)
         if(type==null){
             setMsg("Please select Parity Type");
             return;
         }
         else{
+            setLoading2(false)
             doEverything();
         }
         
@@ -453,7 +450,7 @@ const Ui = (props) => {
 
         setDeStuffData(x);
         let y = parityCheck(x, t);
-        console.log(y +t + "iii")
+
         if(y==true){
             y=x.substring(0, x.length-1)
             setCheckedParityData(y);
@@ -482,6 +479,19 @@ const Ui = (props) => {
 
     const tryAgain = (e) => {
         e.preventDefault();
+        setData(null);
+        setType(null);
+        setFlag(null);
+        setDivisor(null);
+
+        setParityData(null);
+        setCrcData(null);
+        setStuffData(null);
+
+        setDeCrcData(null);
+        setDeStuffData(null);
+        setCheckedParityData(null);
+
         setLoading3(true);
         setLoading2(true);
         document.getElementById("datainput").style.display = "inline-block"
@@ -491,6 +501,9 @@ const Ui = (props) => {
         document.getElementById("flaginput").style.display = "inline-block"
         document.getElementById("flaginputbtn").style.display = "inline-block"
         document.getElementById("radios").style.display = "inline-block"
+        document.getElementById("datainput").value = null;
+        document.getElementById("divisorinput").value = null;
+        document.getElementById("flaginput").value = null;
         
     }
 
@@ -523,9 +536,10 @@ const Ui = (props) => {
                 <button style={{display: "none"}}  id="divisorinputbtn" onClick={makeSecureDivisor}>Submit Divisor</button><br></br><br/>
                 <div id = "radios" style={{display: "none"}}>
                     <form>
-                    <label>Odd</label><input id="radio1" name="radios" type='radio' value="odd" onClick={typeSet}/>
-                    <label>Even</label><input  id="radio2" name="radios" type='radio' value="even" onClick={typeSet}/>
-                    <button onClick={makeSecureParity}>Submit Parity Type</button><br></br><br/>
+                        <label>Select Parity Type:  </label>
+                        <label>Odd</label><input id="radio1" name="radios" type='radio' value="odd" onClick={typeSet}/>
+                        <label>Even</label><input  id="radio2" name="radios" type='radio' value="even" onClick={typeSet}/><br></br><br></br>
+                        <button onClick={makeSecureParity}>Submit Parity Type And Process Data</button><br></br><br/>
                     </form>
                 </div>
                 </form>
