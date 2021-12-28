@@ -12,6 +12,7 @@ const Ui = (props) => {
     const [msg, setMsg] = useState();
     const [msg1, setMsg1] = useState();
     const [msg2, setMsg2] = useState();
+
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [loading1, setLoading1] = useState(false);
     const [loading2, setLoading2] = useState(false);
@@ -324,7 +325,7 @@ const Ui = (props) => {
         }
         const count = bitCheck(data)
         if(count==0){
-            setMsg("Flag is Secure")
+            setMsg("Data is valid")
 
             document.getElementById("datainput").style.display = "none"
             document.getElementById("datainputbtn").style.display = "none"
@@ -395,6 +396,7 @@ const Ui = (props) => {
             return;
         }
         else{
+            setMsg("Data is being processed...");
             setLoading2(false)
             doEverything();
         }
@@ -469,10 +471,13 @@ const Ui = (props) => {
             z = y.substring(0, y.length-dv.length+1)
             setDeCrcData(z);
             setMsg2("Valid Data Received")
+            
         }
         else {
             setDeCrcData("Invalid Data")
             setMsg2("Invalid on CRC Check")
+
+            
         }
 
     }
@@ -582,13 +587,12 @@ const Ui = (props) => {
             { loading3 && <Loading/>}
 
             {!loading3 && isLoggedIn && <div className="logs">
-                <p className="left">CRC: {deCrcData}</p>
-                <p className="left">Parity: {checkedParityData}</p>
-                <p className="left">BitStuffing: {deStuffData}</p>
-                {/* <p className="right">Divisor: {divisor}</p>
-                <p className="right">Parity Type: {type}</p>
-                <p className="right">Flag: {flag}</p> */}
+                <p className="left">Actual Data: {deCrcData}</p>
+                <p className="left">Without Parity Bit: {checkedParityData}</p>
+                <p className="left">DeStuffData: {deStuffData}</p>
+                
                 <p>{msg2}</p>
+  
             </div>}
             
                 
